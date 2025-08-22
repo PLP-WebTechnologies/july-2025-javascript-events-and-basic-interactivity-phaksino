@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Web Page</title>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Interactive Web Page</h1>
+            <div class="theme-toggle">
+                <span>Light</span>
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span>Dark</span>
+            </div>
+        </header>
+
+        <main>
+            <section class="card">
+                <h2>Dark/Light Mode Toggle</h2>
+                <p>Use the toggle switch in the header to change between light and dark themes for the entire page.</p>
+            </section>
+
+            <section class="card counter-game">
+                <h2>Counter Game</h2>
+                <p>Click the buttons to increase or decrease the counter. Try to get exactly 10!</p>
+                <div class="counter-value" id="counter-value">0</div>
+                <div class="counter-buttons">
+                    <button id="decrement-btn">-1</button>
+                    <button id="reset-btn">Reset</button>
+                    <button id="increment-btn">+1</button>
+                </div>
+                <div class="game-message" id="game-message"></div>
+            </section>
+
+            <section class="card">
+                <h2>Form Validation</h2>
+                <form id="validation-form">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" placeholder="Enter your full name">
+                        <div class="error" id="name-error">Please enter a valid name (at least 2 characters)</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="Enter your email">
+                        <div class="error" id="email-error">Please enter a valid email address</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Create a password">
+                        <div class="error" id="password-error">Password must be at least 8 characters with one number and one special character</div>
+                    </div>
+
+                    <button type="submit">Submit</button>
+                </form>
+                <div class="success-message" id="success-message">
+                    Form submitted successfully!
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Interactive Web Page Assignment &copy; 2023</p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        // Check for saved theme preference or respect OS preference
+        if (localStorage.getItem('theme') === 'dark' || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme'))) {
+            document.body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        }
+        
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Counter Game Functionality
+        const counterValue = document.getElementById('counter-value');
+        const decrementBtn = document.getElementById('decrement-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const incrementBtn = document.getElementById('increment-btn');
+        const gameMessage = document.getElementById('game-message');
+        
+        let count = 0;
+        
+        function updateCounter() {
+            counterValue.textContent = count;
+            
+            // Game logic
+            if (count === 10) {
+                gameMessage.textContent = "You won! Exactly 10!";
+                gameMessage.style.color = "var(--success-color)";
+            } else if (count > 10) {
+                gameMessage.textContent = "Too high! Try going down.";
+                gameMessage.style.color = "var(--error-color)";
+            } else {
+                gameMessage.textContent = "";
+            }
+        }
+        
+        decrementBtn.addEventListener('click', function() {
+            count--;
+            updateCounter();
+        });
+        
+        resetBtn.addEventListener('click', function() {
+            count = 0;
+            updateCounter();
+            gameMessage.textContent = "Counter reset!";
+            setTimeout(() => {
+                gameMessage.textContent = "";
+            }, 2000);
+        });
+        
+        incrementBtn.addEventListener('click', function() {
+            count++;
+            updateCounter();
+        });
+
+        // Form Validation Functionality
+        const form = document.getElementById('validation-form');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const nameError = document.getElementById('name-error');
+        const emailError = document.getElementById('email-error');
+        const passwordError = document.getElementById('password-error');
+        const successMessage = document.getElementById('success-message');
+        
+        // Real-time validation
+        nameInput.addEventListener('input', function() {
+            validateName();
+        });
+        
+        emailInput.addEventListener('input', function() {
+            validateEmail();
+        });
+        
+        passwordInput.addEventListener('input', function() {
+            validatePassword();
+        });
+        
+        function validateName() {
+            if (nameInput.value.trim().length < 2) {
+                nameError.style.display = 'block';
+                return false;
+            } else {
+                nameError.style.display = 'none';
+                return true;
+            }
+        }
+        
+        function validateEmail() {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailInput.value)) {
+                emailError.style.display = 'block';
+                return false;
+            } else {
+                emailError.style.display = 'none';
+                return true;
+            }
+        }
+        
+        function validatePassword() {
+            // At least 8 chars, 1 number, 1 special char
+            const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+            if (!passwordRegex.test(passwordInput.value)) {
+                passwordError.style.display = 'block';
+                return false;
+            } else {
+                passwordError.style.display = 'none';
+                return true;
+            }
+        }
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const isNameValid = validateName();
+            const isEmailValid = validateEmail();
+            const isPasswordValid = validatePassword();
+            
+            if (isNameValid && isEmailValid && isPasswordValid) {
+                successMessage.style.display = 'block';
+                
+                // Reset form after successful submission
+                setTimeout(() => {
+                    form.reset();
+                    successMessage.style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
